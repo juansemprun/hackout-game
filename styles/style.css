@@ -1,0 +1,118 @@
+/* < ---------- GENERAL ---------- > */
+
+body {
+  font-family: 'Press Start 2P', sans-serif;
+  padding: 0;
+  margin: 0;
+  background-color: #000;
+  color: #FFF;
+}
+
+.container {
+  display: flex;
+  justify-content: space-between;
+}
+
+/* < ---------- GAME INFO ---------- > */
+
+.game-intro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  width: 600px;
+  line-height: 1.5;
+}
+
+.game-intro h1 {
+  font-size: 3em;
+  text-transform: uppercase;
+  line-height: 1.5;
+  padding-top: 30px
+}
+
+.game-intro p {
+  font-size: 1em;
+  margin: 30px 0;
+  width: 75%;
+}
+
+.score {
+  font-family: 'Press Start 2P', sans-serif;
+  font-size: 2em !important;
+  text-transform: uppercase;
+  margin-top: 60px !important; 
+}
+
+/* < ---------- GAME INFO IMAGES ---------- > */
+
+.enter-key {
+  width: 100px;
+}
+
+.arrow-keys {
+  margin: 10px;
+  width: 120px;
+}
+
+.mistery-box {
+  width: 50px;
+  vertical-align: middle;
+}
+
+/* < ---------- GAME OVER  ---------- > */
+
+.gameover {
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: none;
+}
+
+.hide {
+  display: none;
+}
+
+.visible {
+  display: flex;
+  opacity: 1;
+}
+
+.you-win {
+  height: 200px;
+}
+
+.you-lose {
+  width: 200px;
+}
+
+.restart {
+  font-size: 1.25em;
+  color: #FFF;
+  font-family: 'Russo One', sans-serif;
+}
+
+/* < ---------- GAME STATS ---------- > */
+
+.game-stats {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.game-stats ul {
+  list-style: none;
+  padding: 0;
+}
+
+.game-stats ul li {
+  text-align: center;
+}
+
+.game-stats ul li img {
+  height: 30px;
+}
