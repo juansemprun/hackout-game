@@ -1,6 +1,6 @@
 # Hackout Game
 
-Inspired by the Breakout Game. First project in **Ironhack Madrid 20-08 - Web Dev**.
+Inspired by the Breakout Game. First project in **Ironhack Madrid 20-08**.
 
 ## Getting Started
 
