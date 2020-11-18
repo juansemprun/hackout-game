@@ -1,4 +1,4 @@
-# Hackout Game
+# Hackout Game 🎮
 
 First project in **Ironhack Madrid 20-08**.
 
