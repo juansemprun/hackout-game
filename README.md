@@ -1,10 +1,10 @@
-# Hackout Game 🎮
+# Hackout Game
 
 First project in **Ironhack Madrid 20-08**.
 
 ## Getting Started
 
-You can play [here](https://juansemprun.github.io/hackout-game/)
+You can play [here](https://juansemprun.github.io/hackout-game/) 🎮
 
 ## Built With
  
