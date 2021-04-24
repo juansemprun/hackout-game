@@ -1,6 +1,6 @@
 # Hackout Game
 
-First project in **Ironhack Madrid**.
+First project at **Ironhack Madrid**.
 
 ## Getting Started
 
