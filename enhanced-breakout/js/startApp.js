@@ -1,9 +1,11 @@
 const breakOutGame = {
-  name: 'break out game',
-  authors: 'Ana Bermúdez, Cecilia Moreira, Juan Semprún',
-  version: '1.0.0',
+  name: 'hackout enhanced',
+  originalAuthors: 'Ana Bermúdez, Cecilia Moreira, Juan Semprún',
+  enhancedBy: 'Juan Semprun',
+  version: '2.0.0',
   license: undefined,
-  description: 'Proyecto 1, Canvas game',
+  description:
+    'Enhanced Breakout Game with improved collision system, powerup notifications, and visual upgrades',
   canvasId: undefined,
   ctx: undefined,
   lifes: 3,

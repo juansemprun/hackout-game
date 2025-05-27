@@ -2,76 +2,140 @@
 <html lang="en">
 
 <head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Russo+One&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="./styles/style.css">
-    <title>HACKOUT</title>
-    <meta charset="UTF-8">
+    <title>Hackout Game Collection</title>
+    <style>
+        body {
+            font-family: 'Press Start 2P', monospace;
+            background: #000;
+            color: #fff;
+            margin: 0;
+            padding: 40px;
+            text-align: center;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        h1 {
+            font-size: 3em;
+            margin-bottom: 30px;
+            text-shadow: 3px 3px 0px #333;
+        }
+
+        .subtitle {
+            font-size: 1em;
+            margin-bottom: 50px;
+            color: #aaa;
+        }
+
+        .versions {
+            display: flex;
+            justify-content: center;
+            gap: 60px;
+            flex-wrap: wrap;
+            margin-bottom: 40px;
+        }
+
+        .version-card {
+            background: #111;
+            border: 3px solid #fff;
+            padding: 30px;
+            width: 350px;
+            text-decoration: none;
+            color: #fff;
+            transition: all 0.3s ease;
+        }
+
+        .version-card:hover {
+            background: #222;
+            border-color: #00ff00;
+            transform: translateY(-5px);
+        }
+
+        .version-title {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+
+        .version-desc {
+            font-size: 0.8em;
+            line-height: 1.6;
+            margin-bottom: 35px;
+            color: #ccc;
+        }
+
+        .version-features {
+            font-size: 0.6em;
+            color: #888;
+            text-align: left;
+            margin-bottom: 30px;
+        }
+
+        .version-features li {
+            margin-bottom: 10px;
+        }
+
+        .play-button {
+            background: #00ff00;
+            color: #000;
+            padding: 10px 20px;
+            border: none;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.8em;
+            cursor: pointer;
+        }
+
+        .credits {
+            margin-top: 40px;
+            font-size: 0.6em;
+            color: #666;
+        }
+    </style>
 </head>
 
 <body>
+    <h1>HACKOUT COLLECTION</h1>
+    <div class="subtitle">Choose Your Game Experience</div>
 
-    <div class="container">
+    <div class="versions">
+        <a href="./original-breakout/" class="version-card">
+            <div class="version-title">ORIGINAL v1.0.0</div>
+            <div class="version-desc">The classic breakout experience as originally created</div>
+            <div class="version-features">
+                <ul>
+                    <li>6 rows of colorful bricks</li>
+                    <li>Traditional arcade aesthetics</li>
+                    <li>Classic powerup system</li>
+                    <li>Original collision mechanics</li>
+                </ul>
+            </div>
+            <button class="play-button">PLAY CLASSIC</button>
+        </a>
 
-        <div class="game-intro">
+        <a href="./enhanced-breakout/" class="version-card">
+            <div class="version-title">ENHANCED v2.0.0</div>
+            <div class="version-desc">Improved version with modern features and bug fixes</div>
+            <div class="version-features">
+                <ul>
+                    <li>Fixed collision system</li>
+                    <li>PowerUp notification banners</li>
+                    <li>Modern color palette</li>
+                    <li>4-row optimized layout</li>
+                </ul>
 
-            <h1>Hackout</h1>
-
-            <p>Press Enter to start / pause</p>
-
-            <img class="enter-key" src="./img/enter-key.png" alt="Enter key">
-
-            <p>Use the arrows to move the paddle</p>
-
-            <img class="arrow-keys" src="./img/arrow-keys.png" alt="Arrows">
-
-            <p> WARNING! Mistery boxes <img class="mistery-box" src="./img/box.png" alt="Mistery Box"> </p>
-
-            <p class="score">Score: <span>000</span></p>
-
-        </div>
-
-        <div class="gameover">
-
-            <img src="./img/win.png" alt="You win" class="you-win hide">
-
-            <img src="./img/lose.png" alt="You lose" class="you-lose hide">
-
-            <p class="restart">You can play again in 5 seconds</p>
-
-
-        </div>
-
-        <div id="game-board">
-
-            <canvas id="canvas"></canvas>
-
-        </div>
-
-
-        <div class="game-stats">
-
-            <ul>
-                <li class="life"><img src="./img/heart.png" alt="Heart"></li>
-                <li class="life"><img src="./img/heart.png" alt="Heart"></li>
-                <li class="life"><img src="./img/heart.png" alt="Heart"></li>
-            </ul>
-
-            <ul>
-                <li><img id="sound" src="./img/volume-on.png" alt="Volumen On"></li>
-            </ul>
-
-        </div>
-
+            </div>
+            <button class="play-button">PLAY ENHANCED</button>
+        </a>
     </div>
 
-    <script src="./js/powerUps.js"></script>
-    <script src="./js/ball.js"></script>
-    <script src="./js/paddle.js"></script>
-    <script src="./js/components.js"></script>
-    <script src="./js/startApp.js"></script>
-    <script src="./js/index.js"></script>
-
+    <div class="credits">
+        <p>Original Game: Ana Bermúdez, Cecilia Moreira, Juan Semprún</p>
+        <p>Enhanced Version: Juan Semprun (2025)</p>
+    </div>
 </body>
 
 </html>

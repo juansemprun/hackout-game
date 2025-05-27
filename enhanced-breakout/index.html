@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Russo+One&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./styles/style.css">
+    <title>HACKOUT ENHANCED</title>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <div class="game-intro">
+
+            <h1>Hackout Enhanced</h1>
+
+            <p>Enhanced Version by Juan Semprun - 2025</p>
+
+            <p>Press Enter to start / pause</p>
+
+            <img class="enter-key" src="./img/enter-key.png" alt="Enter key">
+
+            <p>Use the arrows to move the paddle</p>
+
+            <img class="arrow-keys" src="./img/arrow-keys.png" alt="Arrows">
+
+            <p> WARNING! Mystery boxes <img class="mistery-box" src="./img/box.png" alt="Mystery Box"> </p>
+
+            <p class="score">Score: <span>000</span></p>
+
+        </div>
+
+        <div class="gameover">
+
+            <img src="./img/win.png" alt="You win" class="you-win hide">
+
+            <img src="./img/lose.png" alt="You lose" class="you-lose hide">
+
+            <p class="restart">You can play again in 5 seconds</p>
+
+
+        </div>
+
+        <div id="game-board">
+
+            <canvas id="canvas"></canvas>
+
+        </div>
+
+
+        <div class="game-stats">
+
+            <ul>
+                <li class="life"><img src="./img/heart.png" alt="Heart"></li>
+                <li class="life"><img src="./img/heart.png" alt="Heart"></li>
+                <li class="life"><img src="./img/heart.png" alt="Heart"></li>
+            </ul>
+
+            <ul>
+                <li><img id="sound" src="./img/volume-on.png" alt="Volumen On"></li>
+            </ul>
+
+        </div>
+
+    </div>
+
+    <script src="./js/powerUps.js"></script>
+    <script src="./js/ball.js"></script>
+    <script src="./js/paddle.js"></script>
+    <script src="./js/components.js"></script>
+    <script src="./js/startApp.js"></script>
+    <script src="./js/index.js"></script>
+
+</body>
+
+</html>
