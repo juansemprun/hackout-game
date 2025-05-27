@@ -56,7 +56,7 @@
 ## 👥 Credits
 
 - **Original Game**: Ana Bermúdez, Cecilia Moreira, Juan Semprún
-- **Enhanced Version**: Juan Semprun (2025)
+- **Enhanced Version**: Juan Semprún (2025)
 
 ## 🌐 Demo
 
