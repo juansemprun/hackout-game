@@ -74,6 +74,110 @@ const breakOutGame = {
     crazyKeys: 'CRAZY KEYS!',
   },
 
+  // MOBILE SUPPORT SYSTEM
+  isMobile: false,
+  touchStartPos: { x: 0, y: 0 },
+  isMovingLeft: false,
+  isMovingRight: false,
+  touchInterval: null,
+  mobileOverride: null, // For manual testing: true = force mobile, false = force desktop, null = auto-detect
+
+  // RESPONSIVE SCALING SYSTEM
+  baseWidth: 1000, // Reference width for scaling calculations
+  baseHeight: 600, // Reference height for scaling calculations
+  scaleFactor: 1,
+
+  // BASE SIZES (will be scaled based on screen size)
+  basePaddleSize: { w: 200, h: 20 },
+  baseBallSize: { w: 30, h: 30 },
+  baseBrickSize: { w: 105, h: 30 },
+  basePowerUpSize: { w: 35, h: 35 },
+
+  // TESTING FUNCTIONS - Can be called from browser console
+  // Usage: breakOutGame.setMobileMode(true) or breakOutGame.setMobileMode(false)
+  setMobileMode(forceMobile) {
+    this.mobileOverride = forceMobile;
+    this.detectMobileDevice();
+    console.log(
+      `Mobile mode ${
+        forceMobile ? 'ENABLED' : 'DISABLED'
+      } for testing`
+    );
+  },
+
+  resetMobileDetection() {
+    this.mobileOverride = null;
+    this.detectMobileDevice();
+    console.log('Mobile detection reset to auto-detect');
+  },
+
+  // RESPONSIVE SCALING CALCULATIONS
+  calculateResponsiveScaling() {
+    // Calculate scale factor based on screen size vs base dimensions
+    const widthScale = this.canvasSize.w / this.baseWidth;
+    const heightScale = this.canvasSize.h / this.baseHeight;
+
+    // Use the smaller scale to ensure everything fits
+    this.scaleFactor = Math.min(widthScale, heightScale);
+
+    // Minimum scale factor to prevent elements becoming too small
+    this.scaleFactor = Math.max(this.scaleFactor, 0.4);
+
+    // Maximum scale factor to prevent elements becoming too large on big screens
+    this.scaleFactor = Math.min(this.scaleFactor, 1.5);
+
+    // Update all element sizes based on scale factor
+    this.paddleSize = {
+      w: Math.round(this.basePaddleSize.w * this.scaleFactor),
+      h: Math.round(this.basePaddleSize.h * this.scaleFactor),
+    };
+
+    this.ballSize = {
+      w: Math.round(this.baseBallSize.w * this.scaleFactor),
+      h: Math.round(this.baseBallSize.h * this.scaleFactor),
+    };
+
+    this.brickSize = {
+      w: Math.round(this.baseBrickSize.w * this.scaleFactor),
+      h: Math.round(this.baseBrickSize.h * this.scaleFactor),
+    };
+
+    this.powerUpSize = {
+      w: Math.round(this.basePowerUpSize.w * this.scaleFactor),
+      h: Math.round(this.basePowerUpSize.h * this.scaleFactor),
+    };
+
+    // Update ball radius
+    this.ballRadius = this.ballSize.w / 2;
+
+    console.log('Responsive scaling applied:', {
+      scaleFactor: this.scaleFactor,
+      canvasSize: this.canvasSize,
+      paddleSize: this.paddleSize,
+      ballSize: this.ballSize,
+      brickSize: this.brickSize,
+    });
+  },
+
+  // HAPTIC FEEDBACK FOR MOBILE
+  triggerHapticFeedback(pattern = 'light') {
+    if (this.isMobile && navigator.vibrate) {
+      switch (pattern) {
+        case 'light':
+          navigator.vibrate(50);
+          break;
+        case 'medium':
+          navigator.vibrate(100);
+          break;
+        case 'heavy':
+          navigator.vibrate([100, 50, 100]);
+          break;
+        default:
+          navigator.vibrate(50);
+      }
+    }
+  },
+
   // INITIALIZE THE GAME
   init(id) {
     this.canvasId = id;
@@ -85,23 +189,298 @@ const breakOutGame = {
     this.reset();
     this.setEventListener();
     this.soundManagement();
+    this.detectMobileDevice();
+    this.setupMobileControls();
+    this.handleMobileErrors();
+  },
+
+  // MOBILE DEVICE DETECTION
+  detectMobileDevice() {
+    // Check for manual override first (useful for testing)
+    if (this.mobileOverride !== null) {
+      this.isMobile = this.mobileOverride;
+      console.log(
+        'Mobile Detection: Using manual override:',
+        this.isMobile
+      );
+    } else {
+      const userAgent =
+        navigator.userAgent || navigator.vendor || window.opera;
+      const mobileRegex =
+        /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i;
+
+      // Get device characteristics
+      const hasTouchPoints = navigator.maxTouchPoints > 0;
+      const isSmallScreen = window.innerWidth < 768; // More conservative screen size
+      const userAgentIsMobile = mobileRegex.test(
+        userAgent.toLowerCase()
+      );
+
+      // Check for coarse pointer (primary input is touch)
+      const hasCoarsePointer =
+        window.matchMedia &&
+        window.matchMedia('(pointer: coarse)').matches;
+
+      // Check if device has any fine pointer capability (mouse, trackpad, etc.)
+      const hasAnyFinePointer =
+        window.matchMedia &&
+        window.matchMedia('(any-pointer: fine)').matches;
+
+      // Very conservative mobile detection:
+      // 1. User agent explicitly identifies as mobile device, OR
+      // 2. Primary pointer is coarse AND device doesn't have any fine pointer input AND screen is mobile-sized
+      this.isMobile =
+        userAgentIsMobile ||
+        (hasCoarsePointer && !hasAnyFinePointer && isSmallScreen);
+
+      console.log('Mobile Detection Results:', {
+        userAgent: userAgent.substring(0, 100) + '...',
+        userAgentIsMobile: userAgentIsMobile,
+        hasTouchPoints: hasTouchPoints,
+        isSmallScreen: isSmallScreen,
+        hasCoarsePointer: hasCoarsePointer,
+        hasAnyFinePointer: hasAnyFinePointer,
+        screenSize: `${window.innerWidth}x${window.innerHeight}`,
+        finalResult: this.isMobile,
+      });
+    }
+
+    // Show/hide appropriate controls and instructions
+    const desktopInstructions = document.getElementById(
+      'desktop-instructions'
+    );
+    const mobileInstructions = document.getElementById(
+      'mobile-instructions'
+    );
+    const mobileControls = document.getElementById('mobile-controls');
+
+    if (this.isMobile) {
+      desktopInstructions?.classList.add('hidden');
+      mobileInstructions?.classList.remove('hidden');
+      mobileControls?.classList.remove('hidden');
+      console.log('Showing mobile controls');
+    } else {
+      desktopInstructions?.classList.remove('hidden');
+      mobileInstructions?.classList.add('hidden');
+      mobileControls?.classList.add('hidden');
+      console.log('Hiding mobile controls');
+    }
+  },
+
+  // SETUP MOBILE TOUCH CONTROLS
+  setupMobileControls() {
+    if (!this.isMobile) return;
+
+    const startPauseBtn = document.getElementById('start-pause-btn');
+    const leftBtn = document.getElementById('left-btn');
+    const rightBtn = document.getElementById('right-btn');
+
+    // Start/Pause button
+    startPauseBtn.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      if (!this.isPlaying) {
+        this.start();
+        this.isPlaying = true;
+        startPauseBtn.textContent = 'PAUSE';
+      } else {
+        this.pause();
+        this.isPlaying = false;
+        startPauseBtn.textContent = 'START';
+      }
+      this.triggerHapticFeedback('medium');
+    });
+
+    // Left paddle movement
+    leftBtn.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      this.isMovingLeft = true;
+      this.startContinuousMovement('left');
+      this.triggerHapticFeedback('light');
+    });
+
+    leftBtn.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      this.isMovingLeft = false;
+      this.stopContinuousMovement();
+    });
+
+    leftBtn.addEventListener('touchcancel', (e) => {
+      e.preventDefault();
+      this.isMovingLeft = false;
+      this.stopContinuousMovement();
+    });
+
+    // Right paddle movement
+    rightBtn.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      this.isMovingRight = true;
+      this.startContinuousMovement('right');
+      this.triggerHapticFeedback('light');
+    });
+
+    rightBtn.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      this.isMovingRight = false;
+      this.stopContinuousMovement();
+    });
+
+    rightBtn.addEventListener('touchcancel', (e) => {
+      e.preventDefault();
+      this.isMovingRight = false;
+      this.stopContinuousMovement();
+    });
+
+    // Prevent default touch behaviors on mobile controls
+    const mobileControls = document.getElementById('mobile-controls');
+    mobileControls.addEventListener('touchstart', (e) => {
+      e.stopPropagation();
+    });
+    mobileControls.addEventListener('touchmove', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+    });
+
+    // Handle window resize for mobile orientation changes
+    window.addEventListener('resize', () => {
+      // Delay to allow resize to complete
+      setTimeout(
+        () => {
+          this.setDimensions(); // This will also recalculate responsive scaling
+          if (this.paddle && this.ball) {
+            // Recalculate positions for new canvas size and scaling
+            this.paddle.paddlePos.x = Math.min(
+              this.paddle.paddlePos.x,
+              this.canvasSize.w - this.paddle.paddleSize.w
+            );
+            this.ball.ballPos.x = Math.min(
+              Math.max(this.ball.ballPos.x, this.ball.ballRadius),
+              this.canvasSize.w - this.ball.ballRadius
+            );
+            this.ball.ballPos.y = Math.min(
+              Math.max(this.ball.ballPos.y, this.ball.ballRadius),
+              this.canvasSize.h - this.ball.ballRadius
+            );
+
+            // Update object sizes
+            this.paddle.paddleSize = this.paddleSize;
+            this.ball.ballSize = this.ballSize;
+            this.ball.ballRadius = this.ballRadius;
+          }
+        },
+        this.isMobile ? 500 : 250
+      ); // Longer delay for mobile orientation changes
+    });
+  },
+
+  // CONTINUOUS MOVEMENT FOR MOBILE
+  startContinuousMovement(direction) {
+    this.stopContinuousMovement(); // Clear any existing interval
+
+    this.touchInterval = setInterval(() => {
+      if (
+        (direction === 'left' && this.isMovingLeft) ||
+        (direction === 'right' && this.isMovingRight)
+      ) {
+        this.paddle.movePaddle(direction);
+      }
+    }, 16); // ~60fps for smooth movement
+  },
+
+  stopContinuousMovement() {
+    if (this.touchInterval) {
+      clearInterval(this.touchInterval);
+      this.touchInterval = null;
+    }
+  },
+
+  // ENHANCED MOBILE ERROR HANDLING AND EDGE CASES
+  handleMobileErrors() {
+    // Prevent accidental page refresh on mobile
+    window.addEventListener('beforeunload', (e) => {
+      if (this.isPlaying && this.isMobile) {
+        e.preventDefault();
+        e.returnValue = '';
+        return 'Game in progress. Are you sure you want to leave?';
+      }
+    });
+
+    // Handle visibility change (app switching on mobile)
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden && this.isPlaying && this.isMobile) {
+        this.pause();
+        this.isPlaying = false;
+        if (document.getElementById('start-pause-btn')) {
+          document.getElementById('start-pause-btn').textContent =
+            'START';
+        }
+      }
+    });
+
+    // Handle mobile keyboard appearing/disappearing
+    if (this.isMobile) {
+      const initialViewportHeight = window.visualViewport
+        ? window.visualViewport.height
+        : window.innerHeight;
+
+      if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', () => {
+          const currentHeight = window.visualViewport.height;
+          if (currentHeight < initialViewportHeight * 0.75) {
+            // Keyboard is likely open - pause game
+            if (this.isPlaying) {
+              this.pause();
+              this.isPlaying = false;
+              if (document.getElementById('start-pause-btn')) {
+                document.getElementById(
+                  'start-pause-btn'
+                ).textContent = 'START';
+              }
+            }
+          }
+        });
+      }
+    }
   },
 
   // DIMENSIONS FOR THE CANVAS
   setDimensions() {
     const divSize = document.querySelector('#game-board');
+    const canvas = document.getElementById(this.canvasId);
 
-    document
-      .getElementById(this.canvasId)
-      .setAttribute('width', 1000);
-    document
-      .getElementById(this.canvasId)
-      .setAttribute('height', window.innerHeight);
+    // Responsive canvas sizing for mobile and small screens
+    let canvasWidth = 1000;
+    let canvasHeight = window.innerHeight;
+
+    if (this.isMobile || window.innerWidth < 768) {
+      // Mobile sizing - fit to screen width with aspect ratio
+      const maxWidth = Math.min(window.innerWidth - 40, 500); // 20px padding each side
+      const aspectRatio = 1000 / window.innerHeight;
+
+      canvasWidth = maxWidth;
+      canvasHeight = Math.min(
+        maxWidth / aspectRatio,
+        window.innerHeight - 200
+      ); // Leave space for controls
+    } else if (window.innerWidth < 1200) {
+      // Tablet/small desktop sizing
+      canvasWidth = Math.min(window.innerWidth - 100, 800);
+      canvasHeight = Math.min(window.innerHeight - 100, 600);
+    }
+
+    canvas.setAttribute('width', canvasWidth);
+    canvas.setAttribute('height', canvasHeight);
+
+    // Set CSS dimensions for proper scaling
+    canvas.style.width = canvasWidth + 'px';
+    canvas.style.height = canvasHeight + 'px';
 
     this.canvasSize = {
-      w: 1000,
-      h: window.innerHeight,
+      w: canvasWidth,
+      h: canvasHeight,
     };
+
+    // Calculate and apply responsive scaling for all game elements
+    this.calculateResponsiveScaling();
   },
 
   // COMMANDS
@@ -137,7 +516,7 @@ const breakOutGame = {
     this.drawBackground();
 
     const centerX = this.canvasSize.w / 2 - this.paddleSize.w / 2;
-    const centerY = this.canvasSize.h - 50;
+    const centerY = this.canvasSize.h - 50 * this.scaleFactor; // Scale paddle distance from bottom
 
     this.paddle = new Paddle(
       this.ctx,
@@ -145,7 +524,8 @@ const breakOutGame = {
       centerY,
       this.paddleSize.w,
       this.paddleSize.h,
-      this.canvasSize
+      this.canvasSize,
+      this.scaleFactor
     );
     this.ball = new Ball(
       this.ctx,
@@ -153,7 +533,8 @@ const breakOutGame = {
       this.canvasSize.h / 2,
       this.ballSize.w,
       this.ballSize.h,
-      this.canvasSize
+      this.canvasSize,
+      this.scaleFactor
     );
     this.powerUp = new PowerUps(
       this.ctx,
@@ -161,7 +542,9 @@ const breakOutGame = {
       this.paddleSize.h,
       this.ballSize.w,
       this.ballSize.h,
-      this.canvasSize
+      this.canvasSize,
+      this.powerUpSize,
+      this.scaleFactor
     );
 
     this.ball.draw();
@@ -269,11 +652,27 @@ const breakOutGame = {
 
   // DRAW BRICKS WALL
   drawBricks() {
+    // Calculate responsive spacing based on canvas width and brick count
+    const totalBricksWidth = this.brickColumns * this.brickSize.w;
+    const availableSpace = this.canvasSize.w - totalBricksWidth;
+    const horizontalSpacing = Math.max(
+      availableSpace / (this.brickColumns + 1),
+      5
+    );
+
+    // Responsive vertical spacing
+    const verticalSpacing = Math.max(this.brickSize.h * 0.3, 5);
+
     for (let c = 0; c < this.brickColumns; c++) {
       for (let r = 1; r < this.brickRows; r++) {
         if (this.bricks[c][r].status) {
-          this.brickPos.x = c * (this.brickSize.h + 80) + 7; // Add space between columns
-          this.brickPos.y = r * (this.brickSize.w - 70); // Add space between rows
+          // Responsive positioning - center the brick grid
+          this.brickPos.x =
+            horizontalSpacing +
+            c * (this.brickSize.w + horizontalSpacing);
+          this.brickPos.y =
+            50 + r * (this.brickSize.h + verticalSpacing);
+
           this.bricks[c][r].x = this.brickPos.x;
           this.bricks[c][r].y = this.brickPos.y;
 
@@ -293,7 +692,7 @@ const breakOutGame = {
           }
 
           this.ctx.strokeStyle = '#FFFFFF'; // White borders for retro look
-          this.ctx.lineWidth = 2; // Thicker borders
+          this.ctx.lineWidth = Math.max(1, this.scaleFactor); // Scale border width
           this.ctx.strokeRect(
             this.brickPos.x,
             this.brickPos.y,
@@ -408,6 +807,7 @@ const breakOutGame = {
         this.ball.ballVel.y = -Math.abs(speed * Math.cos(angle)); // Always upward
 
         paddle_hit.play();
+        this.triggerHapticFeedback('medium');
       }
     }
   },
@@ -465,6 +865,7 @@ const breakOutGame = {
 
             b.status = false;
             brick_hit.play();
+            this.triggerHapticFeedback('light');
             this.setScore();
             this.isWin();
 
@@ -507,6 +908,7 @@ const breakOutGame = {
           this.paddle.paddlePos.y + this.paddle.paddleSize.h
       ) {
         power_up.play();
+        this.triggerHapticFeedback('heavy');
         this.setPowerUp(this.powerUpsArray[i].type);
         this.showPowerUpBanner(this.powerUpsArray[i].type);
         this.powerUpsArray.splice(i, 1);
@@ -587,37 +989,44 @@ const breakOutGame = {
       let alpha = progress < 0.5 ? 1 : 2 - progress * 2;
       alpha = Math.max(0, Math.min(1, alpha));
 
+      // Responsive banner dimensions
+      const bannerWidth = Math.max(300 * this.scaleFactor, 200);
+      const bannerHeight = Math.max(80 * this.scaleFactor, 60);
+      const bannerX = this.canvasSize.w / 2 - bannerWidth / 2;
+      const bannerY = this.canvasSize.h / 2 - bannerHeight / 2;
+
       // Banner background
       this.ctx.save();
       this.ctx.globalAlpha = alpha * 0.8;
       this.ctx.fillStyle = '#000000';
-      this.ctx.fillRect(
-        this.canvasSize.w / 2 - 200,
-        this.canvasSize.h / 2 - 60,
-        400,
-        120
-      );
+      this.ctx.fillRect(bannerX, bannerY, bannerWidth, bannerHeight);
 
       // Banner border
       this.ctx.globalAlpha = alpha;
       this.ctx.strokeStyle = '#FFFFFF';
-      this.ctx.lineWidth = 3;
+      this.ctx.lineWidth = Math.max(2 * this.scaleFactor, 1);
       this.ctx.strokeRect(
-        this.canvasSize.w / 2 - 200,
-        this.canvasSize.h / 2 - 60,
-        400,
-        120
+        bannerX,
+        bannerY,
+        bannerWidth,
+        bannerHeight
+      );
+
+      // Responsive font size
+      const fontSize = Math.max(
+        Math.round(18 * this.scaleFactor),
+        12
       );
 
       // Banner text
       this.ctx.globalAlpha = alpha;
       this.ctx.fillStyle = '#00FF00';
-      this.ctx.font = 'bold 24px "Press Start 2P", monospace';
+      this.ctx.font = `bold ${fontSize}px "Press Start 2P", monospace`;
       this.ctx.textAlign = 'center';
       this.ctx.fillText(
         this.powerUpBanner.message,
         this.canvasSize.w / 2,
-        this.canvasSize.h / 2 + 10
+        this.canvasSize.h / 2 + fontSize / 4
       );
       this.ctx.restore();
     }
@@ -695,6 +1104,9 @@ const breakOutGame = {
     this.banner(status);
 
     clearInterval(this.interval);
+
+    // Clean up mobile touch intervals
+    this.stopContinuousMovement();
 
     setTimeout(() => {
       document.location.reload();

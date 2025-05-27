@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mobile Detection Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background: #1a1a1a;
+      color: #fff;
+    }
+
+    .test-result {
+      background: #333;
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border-left: 4px solid #4CAF50;
+    }
+
+    .fail {
+      border-left-color: #f44336;
+    }
+
+    .info {
+      background: #444;
+      padding: 10px;
+      margin: 5px 0;
+      border-radius: 4px;
+    }
+
+    button {
+      background: #4CAF50;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      margin: 5px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #45a049;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Mobile Functionality Test</h1>
+  <div id="results"></div>
+
+  <h2>Manual Touch Test</h2>
+  <button id="testTouch">Test Touch Events</button>
+  <div id="touchResult"></div>
+
+  <script>
+    function runTests() {
+      const results = document.getElementById('results');
+      let html = '';
+
+      // Test 1: User Agent Detection
+      const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+      const mobileRegex = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i;
+      const userAgentMatch = mobileRegex.test(userAgent.toLowerCase());
+
+      html += `<div class="test-result ${userAgentMatch ? '' : 'fail'}">
+                <strong>User Agent Mobile Detection:</strong> ${userAgentMatch ? 'PASS' : 'FAIL'}
+                <div class="info">User Agent: ${userAgent}</div>
+            </div>`;
+
+      // Test 2: Touch Support Detection
+      const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+      html += `<div class="test-result ${isTouchDevice ? '' : 'fail'}">
+                <strong>Touch Support Detection:</strong> ${isTouchDevice ? 'PASS' : 'FAIL'}
+                <div class="info">ontouchstart: ${'ontouchstart' in window}</div>
+                <div class="info">maxTouchPoints: ${navigator.maxTouchPoints}</div>
+            </div>`;
+
+      // Test 3: Screen Size Detection
+      const isMobileSize = window.innerWidth < 768;
+      html += `<div class="test-result">
+                <strong>Screen Size Detection:</strong> ${isMobileSize ? 'Mobile Size' : 'Desktop Size'}
+                <div class="info">Window Width: ${window.innerWidth}px</div>
+                <div class="info">Window Height: ${window.innerHeight}px</div>
+            </div>`;
+
+      // Test 4: Final Mobile Detection (same logic as game)
+      const isMobile = userAgentMatch || isTouchDevice;
+      html += `<div class="test-result ${isMobile ? '' : 'fail'}">
+                <strong>Final Mobile Detection:</strong> ${isMobile ? 'MOBILE' : 'DESKTOP'}
+            </div>`;
+
+      // Test 5: Viewport Meta Tag
+      const viewportMeta = document.querySelector('meta[name="viewport"]');
+      html += `<div class="test-result ${viewportMeta ? '' : 'fail'}">
+                <strong>Viewport Meta Tag:</strong> ${viewportMeta ? 'PRESENT' : 'MISSING'}
+                ${viewportMeta ? `<div class="info">Content: ${viewportMeta.content}</div>` : ''}
+            </div>`;
+
+      results.innerHTML = html;
+    }
+
+    // Test touch events
+    document.getElementById('testTouch').addEventListener('touchstart', function (e) {
+      e.preventDefault();
+      document.getElementById('touchResult').innerHTML = '<div class="test-result">Touch Start Event: WORKING</div>';
+    });
+
+    document.getElementById('testTouch').addEventListener('click', function (e) {
+      if (!document.getElementById('touchResult').innerHTML.includes('Touch Start')) {
+        document.getElementById('touchResult').innerHTML = '<div class="test-result fail">Only Click Event: Touch events may not be working</div>';
+      }
+    });
+
+    // Run tests on load
+    runTests();
+
+    // Re-run tests on window resize
+    window.addEventListener('resize', runTests);
+  </script>
+</body>
+
+</html>

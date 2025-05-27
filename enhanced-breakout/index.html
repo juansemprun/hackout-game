@@ -3,7 +3,12 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#000000">
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Russo+One&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./styles/style.css">
     <title>HACKOUT ENHANCED</title>
@@ -19,13 +24,17 @@
 
             <p>Enhanced Version by Juan Semprun - 2025</p>
 
-            <p>Press Enter to start / pause</p>
+            <div id="desktop-instructions">
+                <p>Press Enter to start / pause</p>
+                <img class="enter-key" src="./img/enter-key.png" alt="Enter key">
+                <p>Use the arrows to move the paddle</p>
+                <img class="arrow-keys" src="./img/arrow-keys.png" alt="Arrows">
+            </div>
 
-            <img class="enter-key" src="./img/enter-key.png" alt="Enter key">
-
-            <p>Use the arrows to move the paddle</p>
-
-            <img class="arrow-keys" src="./img/arrow-keys.png" alt="Arrows">
+            <div id="mobile-instructions" class="hidden">
+                <p>Tap START to begin playing</p>
+                <p>Use the on-screen buttons to move the paddle</p>
+            </div>
 
             <p> WARNING! Mystery boxes <img class="mistery-box" src="./img/box.png" alt="Mystery Box"> </p>
 
@@ -47,6 +56,17 @@
         <div id="game-board">
 
             <canvas id="canvas"></canvas>
+
+            <!-- Mobile Controls -->
+            <div id="mobile-controls" class="mobile-controls hidden">
+                <div class="control-row">
+                    <button id="start-pause-btn" class="mobile-btn start-btn">START</button>
+                </div>
+                <div class="control-row">
+                    <button id="left-btn" class="mobile-btn direction-btn">←</button>
+                    <button id="right-btn" class="mobile-btn direction-btn">→</button>
+                </div>
+            </div>
 
         </div>
 

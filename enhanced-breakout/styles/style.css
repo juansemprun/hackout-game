@@ -1,11 +1,28 @@
 /* < ---------- GENERAL ---------- > */
 
+* {
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Old versions of Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
+  -webkit-tap-highlight-color: transparent; /* Remove blue highlight on mobile */
+}
+
 body {
   font-family: 'Press Start 2P', sans-serif;
   padding: 0;
   margin: 0;
   background-color: #000;
-  color: #FFF;
+  color: #fff;
+  /* Prevent zooming on mobile */
+  touch-action: manipulation;
+  /* Prevent scrolling and overscroll */
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+  height: 100%;
 }
 
 .container {
@@ -28,7 +45,7 @@ body {
   font-size: 3em;
   text-transform: uppercase;
   line-height: 1.5;
-  padding-top: 30px
+  padding-top: 30px;
 }
 
 .game-intro p {
@@ -41,7 +58,7 @@ body {
   font-family: 'Press Start 2P', sans-serif;
   font-size: 2em !important;
   text-transform: uppercase;
-  margin-top: 60px !important; 
+  margin-top: 60px !important;
 }
 
 /* < ---------- GAME INFO IMAGES ---------- > */
@@ -84,15 +101,19 @@ body {
 
 .you-win {
   height: 200px;
+  max-width: 90vw;
+  object-fit: contain;
 }
 
 .you-lose {
   width: 200px;
+  max-width: 90vw;
+  object-fit: contain;
 }
 
 .restart {
   font-size: 1.25em;
-  color: #FFF;
+  color: #fff;
   font-family: 'Russo One', sans-serif;
 }
 
@@ -115,4 +136,190 @@ body {
 
 .game-stats ul li img {
   height: 30px;
+}
+
+/* < ---------- MOBILE CONTROLS ---------- > */
+
+.hidden {
+  display: none !important;
+}
+
+.mobile-controls {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  z-index: 10;
+}
+
+.control-row {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.mobile-btn {
+  background: linear-gradient(145deg, #333, #555);
+  border: 2px solid #777;
+  border-radius: 12px;
+  color: #fff;
+  font-family: 'Press Start 2P', sans-serif;
+  font-size: 14px;
+  padding: 15px 20px;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  min-width: 60px;
+  text-align: center;
+}
+
+.mobile-btn:hover {
+  background: linear-gradient(145deg, #444, #666);
+  border-color: #888;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+}
+
+.mobile-btn:active {
+  background: linear-gradient(145deg, #222, #444);
+  border-color: #666;
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+.start-btn {
+  background: linear-gradient(145deg, #4caf50, #45a049);
+  border-color: #4caf50;
+  padding: 15px 30px;
+  font-size: 16px;
+  min-width: 100px;
+}
+
+.start-btn:hover {
+  background: linear-gradient(145deg, #5cbf60, #55b059);
+  border-color: #5cbf60;
+}
+
+.start-btn:active {
+  background: linear-gradient(145deg, #3caf40, #35a039);
+}
+
+.direction-btn {
+  font-size: 20px;
+  min-width: 70px;
+  padding: 15px;
+}
+
+/* < ---------- RESPONSIVE DESIGN ---------- > */
+
+@media screen and (max-width: 768px) {
+  .container {
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+  }
+
+  .game-intro {
+    width: 100%;
+    max-width: 500px;
+    padding: 10px;
+  }
+
+  .game-intro h1 {
+    font-size: 2em;
+    padding-top: 15px;
+  }
+
+  .game-intro p {
+    font-size: 0.8em;
+    margin: 15px 0;
+    width: 90%;
+  }
+
+  .score {
+    font-size: 1.5em !important;
+    margin-top: 30px !important;
+  }
+
+  #game-board {
+    position: relative;
+    width: 100%;
+    max-width: 500px;
+    margin: 20px 0;
+  }
+
+  #canvas {
+    width: 100% !important;
+    height: auto !important;
+    max-width: 500px;
+    border: 2px solid #fff;
+  }
+
+  .game-stats {
+    flex-direction: row;
+    justify-content: space-around;
+    width: 100%;
+    max-width: 500px;
+    padding: 0 20px;
+  }
+
+  .game-stats ul {
+    display: flex;
+    gap: 10px;
+  }
+
+  .enter-key,
+  .arrow-keys {
+    width: 80px;
+  }
+
+  .mistery-box {
+    width: 30px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .game-intro h1 {
+    font-size: 1.5em;
+  }
+
+  .game-intro p {
+    font-size: 0.7em;
+  }
+
+  .score {
+    font-size: 1.2em !important;
+  }
+
+  .mobile-btn {
+    font-size: 12px;
+    padding: 12px 16px;
+    min-width: 50px;
+  }
+
+  .start-btn {
+    font-size: 14px;
+    padding: 12px 24px;
+    min-width: 80px;
+  }
+
+  .direction-btn {
+    font-size: 18px;
+    min-width: 60px;
+    padding: 12px;
+  }
+
+  .control-row {
+    gap: 15px;
+  }
+
+  .mobile-controls {
+    bottom: 15px;
+    gap: 12px;
+  }
 }

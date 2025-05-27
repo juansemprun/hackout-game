@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Debug Mobile Detection</title>
+  <style>
+    body {
+      font-family: monospace;
+      padding: 20px;
+      background: #1a1a1a;
+      color: #00ff00;
+    }
+
+    .result {
+      background: #333;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+      border-left: 4px solid #4CAF50;
+    }
+
+    .fail {
+      border-left-color: #f44336;
+      color: #ff6b6b;
+    }
+
+    .warning {
+      border-left-color: #ff9800;
+      color: #ffcc02;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Mobile Detection Debug</h1>
+  <div id="results"></div>
+
+  <script>
+    function debugMobileDetection() {
+      const results = document.getElementById('results');
+      let html = '';
+
+      // Test individual components
+      const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+      const mobileRegex = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i;
+      const userAgentIsMobile = mobileRegex.test(userAgent.toLowerCase());
+
+      html += `<div class="result ${userAgentIsMobile ? '' : 'fail'}">
+                <strong>User Agent Mobile:</strong> ${userAgentIsMobile}
+                <br><small>${userAgent}</small>
+            </div>`;
+
+      const hasTouchPoints = navigator.maxTouchPoints > 0;
+      html += `<div class="result ${hasTouchPoints ? '' : 'fail'}">
+                <strong>Has Touch Points:</strong> ${hasTouchPoints} (${navigator.maxTouchPoints})
+            </div>`;
+
+      const isSmallScreen = window.innerWidth < 768;
+      html += `<div class="result ${isSmallScreen ? '' : 'fail'}">
+                <strong>Small Screen:</strong> ${isSmallScreen} (${window.innerWidth}px < 768px)
+            </div>`;
+
+      // Test media queries
+      const hasCoarsePointer = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+      html += `<div class="result ${hasCoarsePointer ? '' : 'fail'}">
+                <strong>Coarse Pointer (touch-first):</strong> ${hasCoarsePointer}
+            </div>`;
+
+      const hasFinePointer = window.matchMedia && window.matchMedia('(pointer: fine)').matches;
+      html += `<div class="result ${hasFinePointer ? '' : 'fail'}">
+                <strong>Fine Pointer (mouse-first):</strong> ${hasFinePointer}
+            </div>`;
+
+      // Test any-pointer queries
+      const anyCoarsePointer = window.matchMedia && window.matchMedia('(any-pointer: coarse)').matches;
+      html += `<div class="result ${anyCoarsePointer ? '' : 'fail'}">
+                <strong>Any Coarse Pointer:</strong> ${anyCoarsePointer}
+            </div>`;
+
+      const anyFinePointer = window.matchMedia && window.matchMedia('(any-pointer: fine)').matches;
+      html += `<div class="result ${anyFinePointer ? '' : 'fail'}">
+                <strong>Any Fine Pointer:</strong> ${anyFinePointer}
+            </div>`;
+
+      // Current game logic (updated)
+      const gameLogic = userAgentIsMobile ||
+        (hasCoarsePointer && !anyFinePointer && isSmallScreen);
+
+      html += `<div class="result ${gameLogic ? 'warning' : 'fail'}">
+                <strong>Game Logic Result:</strong> ${gameLogic ? 'MOBILE' : 'DESKTOP'}
+                <br><small>UserAgent Mobile OR (Coarse Pointer AND No Fine Pointer AND Small Screen)</small>
+            </div>`;
+
+      // Testing functions info
+      html += `<div class="result">
+                <strong>Testing Functions Available:</strong>
+                <br><small>In browser console, type:</small>
+                <br><small>breakOutGame.setMobileMode(true) - Force mobile mode</small>
+                <br><small>breakOutGame.setMobileMode(false) - Force desktop mode</small>
+                <br><small>breakOutGame.resetMobileDetection() - Reset to auto-detect</small>
+            </div>`;
+
+      results.innerHTML = html;
+    }
+
+    debugMobileDetection();
+
+    // Update on resize
+    window.addEventListener('resize', debugMobileDetection);
+  </script>
+</body>
+
+</html>

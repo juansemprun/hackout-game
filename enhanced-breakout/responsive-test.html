@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Responsive Scaling Test - Enhanced Breakout</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+      background: #000;
+      color: #fff;
+    }
+
+    .test-container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .size-buttons {
+      margin-bottom: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .size-btn {
+      padding: 10px 15px;
+      background: #333;
+      color: #fff;
+      border: 1px solid #555;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    .size-btn:hover {
+      background: #555;
+    }
+
+    .info-panel {
+      background: #222;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 5px;
+      font-family: monospace;
+    }
+
+    .game-frame {
+      border: 2px solid #444;
+      border-radius: 10px;
+      overflow: hidden;
+      resize: both;
+      min-width: 300px;
+      min-height: 200px;
+      max-width: 100%;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="test-container">
+    <h1>📱 Responsive Scaling Test - Enhanced Breakout</h1>
+
+    <div class="info-panel">
+      <h3>📊 Current Viewport Info:</h3>
+      <div id="viewport-info">Loading...</div>
+    </div>
+
+    <div class="size-buttons">
+      <button class="size-btn" onclick="setSize(375, 667)">📱 iPhone SE (375×667)</button>
+      <button class="size-btn" onclick="setSize(390, 844)">📱 iPhone 12 (390×844)</button>
+      <button class="size-btn" onclick="setSize(768, 1024)">📱 iPad (768×1024)</button>
+      <button class="size-btn" onclick="setSize(1024, 768)">💻 iPad Landscape (1024×768)</button>
+      <button class="size-btn" onclick="setSize(1200, 800)">💻 Desktop (1200×800)</button>
+      <button class="size-btn" onclick="setSize(320, 568)">📱 Small Phone (320×568)</button>
+      <button class="size-btn" onclick="resetSize()">🔄 Reset to Full Size</button>
+    </div>
+
+    <div class="game-frame" id="gameFrame">
+      <iframe src="./index.html" id="gameIframe"></iframe>
+    </div>
+
+    <div style="margin-top: 20px;">
+      <h3>🧪 Test Instructions:</h3>
+      <ul>
+        <li>Click the size buttons to simulate different device sizes</li>
+        <li>Check that all game elements scale properly</li>
+        <li>Verify mobile controls appear on mobile sizes</li>
+        <li>Test power-up banners scale correctly</li>
+        <li>Ensure all elements remain visible and playable</li>
+        <li>You can also manually resize the game frame by dragging the corner</li>
+      </ul>
+
+      <h3>🎯 What to Test:</h3>
+      <ul>
+        <li>✅ Ball size and movement scaling</li>
+        <li>✅ Paddle size and movement scaling</li>
+        <li>✅ Brick layout and spacing</li>
+        <li>✅ Power-up size and movement</li>
+        <li>✅ Power-up banner responsiveness</li>
+        <li>✅ Mobile controls appearance</li>
+        <li>✅ Canvas scaling and aspect ratio</li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    function updateViewportInfo() {
+      const iframe = document.getElementById('gameIframe');
+      const frameRect = iframe.getBoundingClientRect();
+
+      document.getElementById('viewport-info').innerHTML = `
+                <strong>Window:</strong> ${window.innerWidth} × ${window.innerHeight}<br>
+                <strong>Game Frame:</strong> ${Math.round(frameRect.width)} × ${Math.round(frameRect.height)}<br>
+                <strong>Device Pixel Ratio:</strong> ${window.devicePixelRatio}<br>
+                <strong>User Agent:</strong> ${navigator.userAgent.includes('Mobile') ? 'Mobile' : 'Desktop'}
+            `;
+    }
+
+    function setSize(width, height) {
+      const gameFrame = document.getElementById('gameFrame');
+      gameFrame.style.width = width + 'px';
+      gameFrame.style.height = height + 'px';
+      gameFrame.style.maxWidth = width + 'px';
+      gameFrame.style.maxHeight = height + 'px';
+      gameFrame.style.resize = 'none';
+
+      setTimeout(updateViewportInfo, 100);
+    }
+
+    function resetSize() {
+      const gameFrame = document.getElementById('gameFrame');
+      gameFrame.style.width = '100%';
+      gameFrame.style.height = '600px';
+      gameFrame.style.maxWidth = '100%';
+      gameFrame.style.maxHeight = 'none';
+      gameFrame.style.resize = 'both';
+
+      setTimeout(updateViewportInfo, 100);
+    }
+
+    // Update info on load and resize
+    window.addEventListener('load', updateViewportInfo);
+    window.addEventListener('resize', updateViewportInfo);
+
+    // Update info periodically to catch iframe changes
+    setInterval(updateViewportInfo, 2000);
+  </script>
+</body>
+
+</html>

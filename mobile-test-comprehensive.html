@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Enhanced Breakout - Mobile Functionality Test</title>
+  <style>
+    body {
+      font-family: 'Courier New', monospace;
+      padding: 20px;
+      background: #1a1a1a;
+      color: #00ff00;
+      margin: 0;
+    }
+
+    .test-container {
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    .test-section {
+      background: #333;
+      padding: 15px;
+      margin: 15px 0;
+      border-radius: 8px;
+      border: 2px solid #00ff00;
+    }
+
+    .test-result {
+      background: #444;
+      padding: 10px;
+      margin: 5px 0;
+      border-radius: 4px;
+      border-left: 4px solid #4CAF50;
+    }
+
+    .fail {
+      border-left-color: #f44336;
+      color: #ff6b6b;
+    }
+
+    .info {
+      background: #555;
+      padding: 8px;
+      margin: 3px 0;
+      border-radius: 3px;
+      font-size: 12px;
+      color: #ccc;
+    }
+
+    button {
+      background: linear-gradient(145deg, #4CAF50, #45a049);
+      color: white;
+      border: 2px solid #4CAF50;
+      padding: 12px 20px;
+      margin: 8px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: 'Courier New', monospace;
+      font-weight: bold;
+      touch-action: manipulation;
+      user-select: none;
+    }
+
+    button:active {
+      background: linear-gradient(145deg, #3CAF40, #35a039);
+      transform: scale(0.95);
+    }
+
+    .controls-test {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin: 15px 0;
+    }
+
+    h1,
+    h2 {
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    .status {
+      text-align: center;
+      font-size: 14px;
+      margin: 10px 0;
+      padding: 10px;
+      background: #222;
+      border-radius: 5px;
+    }
+
+    iframe {
+      width: 100%;
+      height: 400px;
+      border: 2px solid #00ff00;
+      border-radius: 8px;
+      background: #000;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="test-container">
+    <h1>🎮 Enhanced Breakout<br>Mobile Test Suite</h1>
+
+    <div class="test-section">
+      <h2>📱 Device Detection</h2>
+      <div id="device-tests"></div>
+    </div>
+
+    <div class="test-section">
+      <h2>👆 Touch Controls Test</h2>
+      <div class="controls-test">
+        <button id="test-start">START/PAUSE</button>
+      </div>
+      <div class="controls-test">
+        <button id="test-left">⬅️ LEFT</button>
+        <button id="test-right">➡️ RIGHT</button>
+      </div>
+      <div id="touch-feedback" class="status">Touch buttons to test haptic feedback and events</div>
+    </div>
+
+    <div class="test-section">
+      <h2>📐 Screen & Orientation</h2>
+      <div id="screen-tests"></div>
+      <div class="status">
+        <strong>Current Orientation:</strong> <span id="orientation">Unknown</span><br>
+        <strong>Screen Size:</strong> <span id="screen-size">Calculating...</span>
+      </div>
+    </div>
+
+    <div class="test-section">
+      <h2>🕹️ Game Integration Test</h2>
+      <div class="status">Test the actual enhanced breakout game below:</div>
+      <iframe id="game-frame" src="http://localhost:8080"></iframe>
+      <button onclick="document.getElementById('game-frame').src = document.getElementById('game-frame').src">🔄 Reload
+        Game</button>
+    </div>
+
+    <div class="test-section">
+      <h2>📊 Performance Metrics</h2>
+      <div id="performance-tests"></div>
+    </div>
+  </div>
+
+  <script>
+    // Device Detection Tests
+    function runDeviceTests() {
+      const container = document.getElementById('device-tests');
+      let html = '';
+
+      // User Agent Test
+      const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+      const mobileRegex = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i;
+      const userAgentMatch = mobileRegex.test(userAgent.toLowerCase());
+
+      html += `<div class="test-result ${userAgentMatch ? '' : 'fail'}">
+                <strong>User Agent Detection:</strong> ${userAgentMatch ? '✅ MOBILE' : '❌ DESKTOP'}
+                <div class="info">${userAgent}</div>
+            </div>`;
+
+      // Touch Support Test
+      const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+      html += `<div class="test-result ${isTouchDevice ? '' : 'fail'}">
+                <strong>Touch Support:</strong> ${isTouchDevice ? '✅ SUPPORTED' : '❌ NOT SUPPORTED'}
+                <div class="info">ontouchstart: ${'ontouchstart' in window} | maxTouchPoints: ${navigator.maxTouchPoints}</div>
+            </div>`;
+
+      // Final Mobile Detection
+      const isMobile = userAgentMatch || isTouchDevice;
+      html += `<div class="test-result ${isMobile ? '' : 'fail'}">
+                <strong>Final Detection:</strong> ${isMobile ? '📱 MOBILE DEVICE' : '🖥️ DESKTOP DEVICE'}
+            </div>`;
+
+      // Viewport Test
+      const viewportMeta = document.querySelector('meta[name="viewport"]');
+      html += `<div class="test-result ${viewportMeta ? '' : 'fail'}">
+                <strong>Viewport Meta:</strong> ${viewportMeta ? '✅ CONFIGURED' : '❌ MISSING'}
+                ${viewportMeta ? `<div class="info">${viewportMeta.content}</div>` : ''}
+            </div>`;
+
+      container.innerHTML = html;
+    }
+
+    // Screen and Orientation Tests
+    function runScreenTests() {
+      const container = document.getElementById('screen-tests');
+      const orientationSpan = document.getElementById('orientation');
+      const screenSizeSpan = document.getElementById('screen-size');
+
+      let html = '';
+
+      // Screen Size Test
+      const isMobileSize = window.innerWidth < 768;
+      html += `<div class="test-result">
+                <strong>Screen Classification:</strong> ${isMobileSize ? '📱 Mobile Size' : '🖥️ Desktop Size'}
+                <div class="info">Width: ${window.innerWidth}px | Height: ${window.innerHeight}px</div>
+            </div>`;
+
+      // Pixel Density
+      const pixelRatio = window.devicePixelRatio || 1;
+      html += `<div class="test-result">
+                <strong>Pixel Density:</strong> ${pixelRatio}x ${pixelRatio > 1 ? '(High-DPI)' : '(Standard)'}
+            </div>`;
+
+      // Available Screen Space
+      html += `<div class="test-result">
+                <strong>Available Space:</strong> ${screen.availWidth}x${screen.availHeight}px
+                <div class="info">Total Screen: ${screen.width}x${screen.height}px</div>
+            </div>`;
+
+      container.innerHTML = html;
+
+      // Update orientation
+      const orientation = screen.orientation ? screen.orientation.type :
+        (window.innerWidth > window.innerHeight ? 'landscape' : 'portrait');
+      orientationSpan.textContent = orientation;
+
+      // Update screen size
+      screenSizeSpan.textContent = `${window.innerWidth}x${window.innerHeight}px`;
+    }
+
+    // Touch Controls Test
+    function setupTouchTests() {
+      const startBtn = document.getElementById('test-start');
+      const leftBtn = document.getElementById('test-left');
+      const rightBtn = document.getElementById('test-right');
+      const feedback = document.getElementById('touch-feedback');
+
+      function triggerHaptic(pattern = 'light') {
+        if (navigator.vibrate) {
+          switch (pattern) {
+            case 'light': navigator.vibrate(50); break;
+            case 'medium': navigator.vibrate(100); break;
+            case 'heavy': navigator.vibrate([100, 50, 100]); break;
+          }
+        }
+      }
+
+      function updateFeedback(message, isTouch = false) {
+        feedback.innerHTML = `${isTouch ? '👆' : '🖱️'} ${message} | Haptic: ${navigator.vibrate ? '✅' : '❌'}`;
+      }
+
+      // Touch events
+      startBtn.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        triggerHaptic('medium');
+        updateFeedback('START/PAUSE touched!', true);
+      });
+
+      leftBtn.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        triggerHaptic('light');
+        updateFeedback('LEFT touched!', true);
+      });
+
+      rightBtn.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        triggerHaptic('light');
+        updateFeedback('RIGHT touched!', true);
+      });
+
+      // Click fallbacks
+      startBtn.addEventListener('click', () => updateFeedback('START/PAUSE clicked!', false));
+      leftBtn.addEventListener('click', () => updateFeedback('LEFT clicked!', false));
+      rightBtn.addEventListener('click', () => updateFeedback('RIGHT clicked!', false));
+    }
+
+    // Performance Tests
+    function runPerformanceTests() {
+      const container = document.getElementById('performance-tests');
+      let html = '';
+
+      // Frame Rate Test
+      let frameCount = 0;
+      const startTime = performance.now();
+
+      function countFrames() {
+        frameCount++;
+        if (frameCount < 60) {
+          requestAnimationFrame(countFrames);
+        } else {
+          const endTime = performance.now();
+          const fps = Math.round(60000 / (endTime - startTime));
+          document.getElementById('fps-result').textContent = `${fps} FPS`;
+        }
+      }
+
+      html += `<div class="test-result">
+                <strong>Frame Rate Test:</strong> <span id="fps-result">Testing...</span>
+            </div>`;
+
+      // Memory Usage (if available)
+      if (performance.memory) {
+        const memUsed = Math.round(performance.memory.usedJSHeapSize / 1024 / 1024);
+        const memTotal = Math.round(performance.memory.totalJSHeapSize / 1024 / 1024);
+        html += `<div class="test-result">
+                    <strong>Memory Usage:</strong> ${memUsed}MB / ${memTotal}MB
+                </div>`;
+      }
+
+      // Touch Latency Test
+      html += `<div class="test-result">
+                <strong>Touch Latency:</strong> <span id="latency-result">Touch to test</span>
+                <div class="info">Tap this area to measure touch response time</div>
+            </div>`;
+
+      container.innerHTML = html;
+      requestAnimationFrame(countFrames);
+
+      // Touch latency measurement
+      let touchStartTime = 0;
+      container.addEventListener('touchstart', () => {
+        touchStartTime = performance.now();
+      });
+      container.addEventListener('touchend', () => {
+        if (touchStartTime) {
+          const latency = Math.round(performance.now() - touchStartTime);
+          document.getElementById('latency-result').textContent = `${latency}ms`;
+        }
+      });
+    }
+
+    // Orientation Change Handler
+    function handleOrientationChange() {
+      setTimeout(() => {
+        runScreenTests();
+      }, 500); // Delay to allow orientation change to complete
+    }
+
+    // Initialize All Tests
+    function initTests() {
+      runDeviceTests();
+      runScreenTests();
+      setupTouchTests();
+      runPerformanceTests();
+    }
+
+    // Event Listeners
+    window.addEventListener('resize', runScreenTests);
+    window.addEventListener('orientationchange', handleOrientationChange);
+    screen.orientation?.addEventListener('change', handleOrientationChange);
+
+    // Run tests on load
+    document.addEventListener('DOMContentLoaded', initTests);
+
+    // Refresh tests every 5 seconds
+    setInterval(() => {
+      runScreenTests();
+    }, 5000);
+  </script>
+</body>
+
+</html>
